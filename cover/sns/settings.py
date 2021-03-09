@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
 INSTALLED_APPS += [
     'apis.apps.ApisConfig',
+    'contents.apps.ContentsConfig',
 ]
 
 MIDDLEWARE = [
@@ -58,7 +59,7 @@ ROOT_URLCONF = 'sns.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
