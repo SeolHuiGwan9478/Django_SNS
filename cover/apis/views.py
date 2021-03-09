@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.db import IntegrityError 
 from django.core.validators import validate_email, ValidationError
+from django.contrib.auth import authenticate, login, logout
 #IntegritError는 user model이 null 값을 가지고 있을 때를 의미한다.
 # Create your views here.
 
@@ -13,8 +14,8 @@ class BasicView(View):
     @staticmethod
     def response(data={}, message='', status=200):
         result = {
-            'data':data
-            'message': message
+            'data':data,
+            'message': message,
         }
         return JsonResponse(result, status)
 
@@ -45,3 +46,25 @@ class UserCreateView(BasicView):
             return self.response(message="이미 존재하는 아이디입니다.", status=400)
 
         return self.response({'user_id': user.id})
+
+class UserLoginView(BasicView):
+    def post(self, request):
+        username = request.POST.get('username', '')
+        if not username:
+            return self.response(message='아이디를 입력해주세요.', status=400)
+        password = request.POST.get('password', '')
+        if not password:
+            return self.response(message='비밀번호를 입력해주세요.', status=400)
+        user = authenticate(request, username=username, password=password)
+
+        if user is None:
+            return self.response(message='입력 정보를 확인해주세요', status=400)
+        login(request, user)
+
+        return self.response()
+
+class UserLogoutView(BasicView):
+    def get(self, request):
+        logout(request)
+        return self.response()
+        
