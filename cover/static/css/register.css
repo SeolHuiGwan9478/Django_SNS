@@ -1,14 +1,14 @@
-#login .container{
+#register .container{
     margin-top: 120px;
     width: 600px;
     height: 400px;
     border: 1px solid #9c9c9c;
 }
 
-#login .container #login-row #login-column #login-box #login-form{
+#register .container #register-row #register-column #register-box #register-form{
     padding: 20px;
 }
 
-#login .container #login-row #login-column #login-box #login-form #register-link{
+#register .container #register-row #register-column #register-box #register-form #register-link{
     margin-top: -85px;
 }

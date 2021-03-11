@@ -2,25 +2,25 @@
 {% load static %}
 {% block head %}
 <title>Login</title>
-<link rel="stylesheet" href="{% static 'css/register.css' %}">
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
 {% endblock %}
 
 {% block body %}
 <div id="login">
     <div class="container">
         <br>
-        <h3 class="text-center text-danger">login</h3><br>
+        <h3 class="text-center text-danger">Login</h3><br>
         <div class="form-group col-md-12">
             <label for="username" class="text-danger">Username</label><br>
             <input type="text" name="username" id="username" class="form-control">
         </div>
         <div class="form-group col-md-12">
             <label for="password" class="text-danger">password</label><br>
-            <input type="text" name="username" id="username" class="form-control">
+            <input type="password" name="password" id="password" class="form-control">
         </div><br>
         <div class="form-group col-md-12">
             <div class="row">
-                <input type="submit" id="login" class="form-control btn btn-danger" value="submit">
+                <input type="submit" id="login_button" class="form-control btn btn-danger" value="submit">
             </div>
         </div>
         <div class="form-group col-md-12">
@@ -33,16 +33,16 @@
 
 <script>
     $(document).ready(function () {
-        $('#login-submit').click(function(){
-            $.post('/apis/v1/users/login', {'username':$('#username').val(), 'password':$('#password').val()}, function(){
-                location.reload();
+        $('#login_button').click(function(){
+            $.post('/apis/v1/users/login/', {'username':$('#username').val(), 'password':$('#password').val()}, function(){
+                window.location = "{% url 'content_home' %}";
             }).fail(function(data) {
                 alert(data.responseJSON.message);
             });
         });
     });
 </script>
-<script>
+<!-- <script>
     $(document).ready(function () {
         $('#logout-submit').click(function(){
             $.get('/apis/v1/users/logout', {}, function(){
@@ -50,5 +50,5 @@
             })
         });
     });
-</script>
+</script> -->
 {% endblock %}
