@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.db import IntegrityError 
 from django.core.validators import validate_email, ValidationError
 from django.contrib.auth import authenticate, login, logout
+from django.views.generic.base import TemplateView
 #IntegritError는 user model이 null 값을 가지고 있을 때를 의미한다.
 # Create your views here.
 
@@ -22,7 +23,6 @@ class BasicView(View):
 class UserCreateView(BasicView):
     #이것을 써주면 csrf_token으로 따로 써줄 필요가 없다.
     @method_decorator(csrf_exempt)
-
     def dispatch(self, request, *args, **kwargs):
         return super(UserCreateView,self).dispatch(request, *args, **kwargs)
 
@@ -54,7 +54,7 @@ class UserLoginView(BasicView):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(UserLoginView,self).dispatch(request, *args, **kwargs)
-        
+
     def post(self, request):
         username = request.POST.get('username', '')
         if not username:
@@ -74,3 +74,9 @@ class UserLogoutView(BasicView):
     def get(self, request):
         logout(request)
         return self.response()
+
+class NoneUserTemplateView(TemplateView):
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_anonymous:
+            return redirect('contents_home')
+        return super(NoneUserTemplateView, self).dispatch(request, *args, **kwargs)
