@@ -5,5 +5,20 @@
 {% endblock %}
 
 {% block body %}
-<h1>홈이다.</h1> 
+<h1>홈이다</h1>
+<!-- <div class="post">
+    <div class="user-block">
+        {% for content in contents %}
+        {% for image in content.image_set.all %}
+        <img class="img-circle img-bordered-sm" src="{{ image.image.url }}" alt="User Image">
+        {% endfor %}
+        <span class="username">
+            <a href="#">{{ content.user.username }}</a>
+            <a href="#" class="pull-right btn-box-tool"><i class="fa fa-times"></i></a>"
+        </span>
+        <span class="description">Posted 5 photos - 5 days ago</span>
+        <p>{{ content.text }}</p>
+    </div>
+    {% endfor %}
+</div> -->
 {% endblock %}

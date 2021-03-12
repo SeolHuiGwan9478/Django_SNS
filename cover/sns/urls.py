@@ -18,6 +18,8 @@ from django.urls import path, include
 from contents.views import HomeView
 from django.views.generic import TemplateView
 from apis.views import NoneUserTemplateView
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,3 +28,5 @@ urlpatterns = [
     path('login/', NoneUserTemplateView.as_view(template_name='login.html'), name='login'),
     path('register/', NoneUserTemplateView.as_view(template_name='register.html'), name='register'),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

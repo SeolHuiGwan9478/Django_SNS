@@ -78,5 +78,5 @@ class UserLogoutView(BasicView):
 class NoneUserTemplateView(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_anonymous:
-            return redirect('contents_home')
+            return redirect('content_home')
         return super(NoneUserTemplateView, self).dispatch(request, *args, **kwargs)
