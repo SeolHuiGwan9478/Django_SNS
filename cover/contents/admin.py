@@ -10,3 +10,8 @@ class ContentAdmin(admin.ModelAdmin):
     list_display = ('user', 'created_at')
 
 admin.site.register(Content, ContentAdmin)
+
+class FollowRelationAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(FollowRelation, FollowRelationAdmin)
