@@ -1,11 +1,101 @@
 {% extends '_base.html' %}
-
+{% load static %}
 {% block head %}
 <title>Home</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dropzone@5.5.1/dist/dropzone.min.css">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
 {% endblock %}
 
 {% block body %}
-<h1>홈이다</h1>
+<nav class="fast-nav navbar navbar-expand-lg navbar-light bg-white">
+    <a class="navbar-brand text-danger col-sm-8" href="{% url 'content_home' %}"><b>Seolstagram</b></a>
+    <div class="collapse navbar-collapse col-sm-4" id="navbarText" style="display: inline-block !important; text-align: right;">
+        <span class="navbar-text col-sm-3">
+            {{ request.user }}
+        </span>
+        <span class="navbar-text col-sm-3">
+            <a href="{% url 'apis_v1_user_logout' %}" id="logout" style="display: inline-block; width: 80px; height: 20px;">로그아웃</a>
+        </span>
+    </div>
+</nav>
+<script src="https://cdn.jsdelivr.net/npm/dropzone@5.5.1/dist/dropzone.min.js"></script>
+<br>
+<div id="formContainer">
+    <form action="{% url 'apis_v1_content_create' %}" class="dropzone" id="uploader" style="background-color: whitesmoke;">
+        <div class="dz-message" data-dz-message><span>드래그 드랍하거나 클릭하여 이미지 선택</span></div>
+        <div class="fallback">
+            <input name="file" type="file">
+        </div>
+    </form>
+    <div class="form-group">
+        <label>아래에 글을 입력해주세요.</label>
+        <textarea class="form-control rounded-0" id="text" rows="3"></textarea>
+    </div>
+    <div style="text-align: right;">
+        <button type="button" class="btn btn-danger" id="upload">작성하기</button>
+    </div>
+</div>
+
+{% for content in contents %}
+<div class="content">
+    <div class="post">
+        <div class="user-block">
+            <h5 class="text-info" style="text-align: left;">{{ content.user.username }}</h5>
+            <hr>
+            {% for image in content.image_set.all %}
+            <img class="img-info img-circle img-bordered-sm" src="{{ image.image.url }}" alt="User Image">
+            <br>
+            {% endfor %}
+            <hr>
+            <div>
+                <span class="username" style="text-align:left;">
+                    <a href="#" class="text-info">{{ content.user.username }}</a>
+                    <a href="#" class="pull-right btn-box-tool"><i class="fa fa-times"></i></a>
+                </span>
+            </div>
+            <p>{{ content.text }}</p>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<script>
+    Dropzone.autoDiscover = false;
+
+    var dropZoneUploader = new Dropzone('form#uploader', {
+        init: function () {
+            var dropzone = this;
+
+            $('#upload').click(function (){
+                dropZoneUploader.processQueue();
+            });
+
+            dropzone.on("sending", function(file, xhr, formData){
+                formData.append("text", $('#text').val())
+            });
+        },
+        pararlleUploads: 10,
+        autoProcessQueue: false,
+        type: 'POST',
+        success: function(){
+            location.reload();
+        },
+        error: function(e){
+            console.log(e)
+            alert('에러가 발생했습니다. 다시 시도해주세요.');
+        },
+        acceptedFiles: ".jpeg, .jpg, .png, .gif",
+        uploadMultiple: true,
+    });
+</script>
+<!-- <script>
+    $(document).ready(function () {
+        $('#logout').click(function(){
+            $.get('/apis/v1/users/logout', {}, function(){
+                window.location ="{% url 'login' %}";
+            })
+        });
+    });
+</script> -->
 <!-- <div class="post">
     <div class="user-block">
         {% for content in contents %}

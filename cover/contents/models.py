@@ -32,5 +32,5 @@ class Image(BaseModel):
         ordering = ['order']
 
 class FollowRelation(BaseModel):
-    follower = models.ManyToManyField(User, related_name='follower')
+    follower = models.OneToOneField(User, related_name='follower', on_delete=models.CASCADE)
     followee = models.ManyToManyField(User, related_name='followee')

@@ -8,6 +8,8 @@ from django.db import IntegrityError
 from django.core.validators import validate_email, ValidationError
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic.base import TemplateView
+from django.contrib.auth.decorators import login_required
+from contents.models import Content, Image
 #IntegritError는 user model이 null 값을 가지고 있을 때를 의미한다.
 # Create your views here.
 
@@ -80,3 +82,13 @@ class NoneUserTemplateView(TemplateView):
         if not request.user.is_anonymous:
             return redirect('content_home')
         return super(NoneUserTemplateView, self).dispatch(request, *args, **kwargs)
+
+@method_decorator(login_required, name='dispatch')
+class ContentCreateView(BasicView):
+    def post(self, request):
+        text = request.POST.get('text','').strip()
+        content = Content.objects.create(user=request.user, text=text)
+        for idx, file in enumerate(request.FILES.values()):
+            Image.objects.create(content=content, image=file, order=idx)
+        
+        return self.response()

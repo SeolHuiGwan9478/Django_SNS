@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Content, Image
+from .models import Content, Image, FollowRelation
 # Register your models here.
 
 class ImageInline(admin.TabularInline):

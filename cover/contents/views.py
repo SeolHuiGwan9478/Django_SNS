@@ -19,5 +19,5 @@ class HomeView(TemplateView):
             user__id__in = lookup_user_ids #이 변수는 아직 모르겠음.
         )
 
-        return context
+        return context 
 
