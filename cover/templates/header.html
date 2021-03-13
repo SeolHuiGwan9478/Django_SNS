@@ -1,0 +1,14 @@
+{% extends '_base.html' %}
+{% block body %}
+<nav class="fast-nav navbar navbar-expand-lg navbar-light bg-white">
+    <a class="navbar-brand text-danger col-sm-8" href="{% url 'content_home' %}"><b>Seolstagram</b></a>
+    <div class="collapse navbar-collapse col-sm-4" id="navbarText" style="display: inline-block !important; text-align: right;">
+        <span class="navbar-text col-sm-3">
+            {{ request.user }}
+        </span>
+        <span class="navbar-text col-sm-3">
+            <a href="{% url 'apis_v1_user_logout' %}" id="logout" style="display: inline-block; width: 80px; height: 20px;">로그아웃</a>
+        </span>
+    </div>
+</nav>
+{% endblock %}

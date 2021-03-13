@@ -1,0 +1,29 @@
+{% include 'header.html' %}
+{% block body %}
+<p>사용자 찾기</p>
+<input type="text" id="searchUserName" placeholder="아이디를 입력해주세요.">
+<button id="search">검색</button>
+<hr>
+
+{% if followers %}
+<h2>날 팔로우 하는 사람들</h2>
+<ul>
+    {% for obj in followers %}
+    <li>{{ obj.followers.username }}{% if obj.follower.id not in followees_ids %} - <button class="follow" data-user-id="{{ obj.followers.id }}">팔로우</button></li>
+    {% endif %}
+    {% endfor %}
+</ul>
+{% endif %}
+</ul>
+
+{% if followees %}
+<h2>내가 팔로우 하는 사람들</h2>
+<ul>
+    {% for user in followees %}
+    <li>{{ user.username }} - <button class="unfollow" data-user-id="{{ user.id }}">언팔로우</button></li>   
+    {% endfor %}
+</ul>
+{% endif %}
+</ul>
+
+{% endblock %}

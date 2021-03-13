@@ -14,6 +14,9 @@
             {{ request.user }}
         </span>
         <span class="navbar-text col-sm-3">
+            <a href="{% url 'relation' %}" id="relation" style="display: inline-block; width: 80px; height: 20px;">친구목록</a>
+        </span>
+        <span class="navbar-text col-sm-3">
             <a href="{% url 'apis_v1_user_logout' %}" id="logout" style="display: inline-block; width: 80px; height: 20px;">로그아웃</a>
         </span>
     </div>
@@ -87,7 +90,7 @@
         uploadMultiple: true,
     });
 </script>
-<!-- <script>
+<script>
     $(document).ready(function () {
         $('#logout').click(function(){
             $.get('/apis/v1/users/logout', {}, function(){
@@ -95,7 +98,7 @@
             })
         });
     });
-</script> -->
+</script>
 <!-- <div class="post">
     <div class="user-block">
         {% for content in contents %}

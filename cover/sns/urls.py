@@ -20,6 +20,7 @@ from django.views.generic import TemplateView
 from apis.views import NoneUserTemplateView
 from django.conf.urls.static import static
 from django.conf import settings
+from apis.views import RelationView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,6 +28,7 @@ urlpatterns = [
     path('', HomeView.as_view(), name='content_home'),
     path('login/', NoneUserTemplateView.as_view(template_name='login.html'), name='login'),
     path('register/', NoneUserTemplateView.as_view(template_name='register.html'), name='register'),
+    path('relation', RelationView.as_view(), name='relation'),
 ]
 
 if settings.DEBUG:

@@ -9,7 +9,7 @@ from django.core.validators import validate_email, ValidationError
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic.base import TemplateView
 from django.contrib.auth.decorators import login_required
-from contents.models import Content, Image
+from contents.models import Content, Image, FollowRelation
 #IntegritError는 user model이 null 값을 가지고 있을 때를 의미한다.
 # Create your views here.
 
@@ -92,3 +92,30 @@ class ContentCreateView(BasicView):
             Image.objects.create(content=content, image=file, order=idx)
         
         return self.response()
+
+@method_decorator(login_required, name='dispatch')
+class RelationView(TemplateView):
+    template_name = 'relation.html'
+
+class RelationCreateView(BasicView):
+    def post(self, request):
+        try:
+            user_id = request.POST.get('id','')
+        except ValueError:
+            return self.response(message='잘못된 요청입니다.', status=400)
+    
+        try:
+            relation = FollowRelation.objects.get(follower=request.user)
+        except FollowRelation.DoesNotExist:
+            relation = FollowRelation.objects.create(follower=request.user)
+    
+        try:
+            if user_id == request.user.id:
+                # 자기 자신은 팔로우 안됨.
+                raise IntegrityError
+            relation.followee.add(user_id)
+            relation.save()
+        except IntegrityError:
+            return self.response(message='잘못된 요청입니다.')
+        
+        return self.response({})
