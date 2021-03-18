@@ -5,24 +5,22 @@
 <button id="search">검색</button>
 <hr>
 
-{% if followers %}
+{% if followees %}
 <h2>날 팔로우 하는 사람들</h2>
 <ul>
-    {% for obj in followers %}
-    <li>{{ obj.followers.username }}{% if obj.follower.id not in followees_ids %}{% endif %}- <button class="follow" data-user-id="{{ obj.followers.id }}">팔로우</button></li>
+    {% for obj in followees %}
+    <li>{{ obj.username }} - <button class="follow" data-user-id="{{ obj.id }}">팔로우</button></li>
     {% endfor %}
 </ul>
 {% endif %}
-</ul>
 
-{% if followees %}
+{% if followers %}
 <h2>내가 팔로우 하는 사람들</h2>
 <ul>
-    {% for user in followees %}
-    <li>{{ user.username }} - <button class="unfollow" data-user-id="{{ user.id }}">언팔로우</button></li>   
+    {% for user in followers %}
+    <li>{{ user.follower.username }} - <button class="unfollow" data-user-id="{{ user.follower.id }}">언팔로우</button></li>   
     {% endfor %}
 </ul>
 {% endif %}
-</ul>
 
 {% endblock %}

@@ -105,15 +105,18 @@ class RelationView(TemplateView):
 
         # 내가 팔로우하는 사람들
         try:
-            followers = FollowRelation.objects.get(follower=user).followee.all()
-            context['followees'] = followers
-            context['followees_ids'] = list(followers.values_list('id', flat=True))
+            followees = FollowRelation.objects.get(follower=user).followee.all()
+            context['followees'] = followees
+            context['followees_ids'] = list(followees.values_list('id', flat=True))
             
         except FollowRelation.DoesNotExist:
             pass
 
-        context['followers'] = FollowRelation.objects.select_related('follower').filter(followee__in=[user])
-        
+        try:
+            context['followers'] = FollowRelation.objects.filter(followee=user)
+        except FollowRelation.DoesNotExist:
+            pass
+
         return context
 
 @method_decorator(login_required, name='dispatch')
