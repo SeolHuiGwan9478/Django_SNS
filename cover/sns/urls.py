@@ -28,7 +28,7 @@ urlpatterns = [
     path('', HomeView.as_view(), name='content_home'),
     path('login/', NoneUserTemplateView.as_view(template_name='login.html'), name='login'),
     path('register/', NoneUserTemplateView.as_view(template_name='register.html'), name='register'),
-    path('relation', RelationView.as_view(), name='relation'),
+    path('relation/', RelationView.as_view(), name='relation'),
 ]
 
 if settings.DEBUG:

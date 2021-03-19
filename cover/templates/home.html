@@ -8,18 +8,18 @@
 
 {% block body %}
 <nav class="fast-nav navbar navbar-expand-lg navbar-light bg-white">
-    <a class="navbar-brand text-danger col-sm-8" href="{% url 'content_home' %}"><b>DDongstagram</b></a>
-    <div class="collapse navbar-collapse col-sm-4" id="navbarText" style="display: inline-block !important; text-align: right;">
-        <span class="navbar-text col-sm-3">
-            {{ request.user }}
-        </span>
-        <span class="navbar-text col-sm-3">
-            <a href="{% url 'relation' %}" id="relation" style="display: inline-block; width: 80px; height: 20px;">친구목록</a>
-        </span>
-        <span class="navbar-text col-sm-3">
-            <a href="{% url 'apis_v1_user_logout' %}" id="logout" style="display: inline-block; width: 80px; height: 20px;">로그아웃</a>
-        </span>
-    </div>
+    <a class="navbar-brand text-danger col-md-2" href="{% url 'content_home' %}"><b>DDongstagram</b></a>
+    <div id='menu' style="float: right; width: 260px;">
+        <ul style="list-style-type: none;">
+            <li style="float: left; margin: 10px;">{{ request.user }}<li>
+            <li style="float: left; margin: 10px;">
+                <a class="nav-item nav-link" style="color: black;" href="{% url 'relation' %}">친구목록</a>
+            </li>
+            <li style="float: left; margin: 10px;"> 
+                <a class="nav-item nav-link" style="color: black;"href="{% url 'apis_v1_user_logout' %}" id="logout">로그아웃</a>
+            </li>
+        </ul>
+    </div>    
 </nav>
 <script src="https://cdn.jsdelivr.net/npm/dropzone@5.5.1/dist/dropzone.min.js"></script>
 <br>

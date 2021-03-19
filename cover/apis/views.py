@@ -105,9 +105,9 @@ class RelationView(TemplateView):
 
         # 내가 팔로우하는 사람들
         try:
-            followees = FollowRelation.objects.get(follower=user).followee.all()
-            context['followees'] = followees
-            context['followees_ids'] = list(followees.values_list('id', flat=True))
+            followers = FollowRelation.objects.get(follower=user).followee.all()
+            context['followees'] = followers
+            context['followees_ids'] = list(followers.values_list('id', flat=True))
             
         except FollowRelation.DoesNotExist:
             pass
@@ -117,9 +117,11 @@ class RelationView(TemplateView):
         except FollowRelation.DoesNotExist:
             pass
 
+        print(context)    
         return context
 
 @method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
 class RelationCreateView(BasicView):
     def post(self, request):
         try:
@@ -145,6 +147,7 @@ class RelationCreateView(BasicView):
 
 
 @method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
 class RelationDeleteView(BasicView):
     def post(self, request):
         try:
@@ -166,3 +169,13 @@ class RelationDeleteView(BasicView):
             return self.response(message="잘못된 요청입니다.", status=400)
 
         return self.response({})
+
+class UserGetView(BasicView):
+
+    def get(self, request):
+        username = request.GET.get('username','').strip()
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            self.response(message='사용자를 찾을 수 없습니다.', status=404)
+        return self.response({'username': username, 'email': user.email, 'id':user.id})
