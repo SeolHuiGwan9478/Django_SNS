@@ -22,6 +22,26 @@ class BasicView(View):
         }
         return JsonResponse(result, status=status)
 ```
+- 이번 SNS 프로젝트에서는 BLOG 프로젝트와 달리 FBV(Function-Based View)가 아닌 CBV(Class-Based View) 방식을 사용하였다.
+- jQuery를 이용하여 Template에 데이터를 전달해주었기 때문에 HttpResponse의 Subclass인 JsonResponse를 이용하였다. 
+#### CBV vs FBV
+1. CBV(클래스 뷰)
+- 프로젝트 내부의 App의 views.py 파일을 `Class`를 기반으로 구현한 것을 말한다.
+- 쉽게 확장하고 재사용하기 쉬움
+- mixin(다중상속)과 같은 기능 사용가능
+- 별도의 클래스 메소드로 HTTP 메소드 처리
+- Django에서 제공하는 Genric View 사용
+* 데코레이터 사용하기 위해서 별도의 @method decorator를 import 해주어야 함.
+2. FBV(함수 뷰)
+- 프로젝트 내부의 App의 views.py 파일을 `Function`을 기반으로 구현한 것을 말한다.
+- 간단한 구현
+- 읽기 쉽다
+- 명시적 코드흐름
+- 데코레이터의 간단한 사용법
+* 조건문을 이용한 HTTP 메소드 처리
+* 확장과 재사용에 어려움
+
+출처: https://milkoon1.tistory.com/101 [EMDI는 지금도 개발중]
 ## Chapter2. User API
 ## Chapter3. Login & Logout API
 ## Chapter4. Register API
