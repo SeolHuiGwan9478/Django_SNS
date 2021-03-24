@@ -41,7 +41,6 @@ class BasicView(View):
 * 조건문을 이용한 HTTP 메소드 처리
 * 확장과 재사용에 어려움
 
-출처: https://milkoon1.tistory.com/101 [EMDI는 지금도 개발중]
 ## Chapter2. User API
 ## Chapter3. Login & Logout API
 ## Chapter4. Register API
