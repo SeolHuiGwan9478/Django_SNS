@@ -41,9 +41,10 @@
 
 {% for content in contents %}
 <div class="content">
+    <br>
     <div class="post">
         <div class="user-block">
-            <h5 class="text-info" style="text-align: left;">{{ content.user.username }}</h5>
+            <h5 class="text-info" style="text-align: center;">{{ content.user.username }}</h5>
             <hr>
             {% for image in content.image_set.all %}
             <img class="img-info img-circle img-bordered-sm" src="{{ image.image.url }}" alt="User Image">
