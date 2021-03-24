@@ -43,7 +43,7 @@ HttpRequest.POST # POST 파라미터를 담고 있는 딕셔너리 같은 객체
 - HttpRedirect: 별다른 response를 하지 않고, 지정된 url 페이지로 redirect 함
 - HttpResponse: response를 반환하는 가장 기본적인 함수, 주로 html를 반환
 - Render: httpResponse 객체를 반환하는 함수로 template를 context와 함께 httpResponse로 반환해주는 함수. template_name 인자에 불러오고 싶은 템플릿 명을 적고, context에는 View에서 사용하던 변수를 html 템플릿에 전달하는 역할을 한다. 딕셔너리 형태로 context를 전달해주어야 한다. key 값이 템플릿에서 사용할 변수이름, value 값이 파이썬 변수가 된다.
-출처: https://velog.io/@jcinsh/Django-request-response
+- 출처: https://velog.io/@jcinsh/Django-request-response
 #### CBV vs FBV
 1. CBV(클래스 뷰)
 - 프로젝트 내부의 App의 views.py 파일을 `Class`를 기반으로 구현한 것을 말한다.
