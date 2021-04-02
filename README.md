@@ -95,7 +95,14 @@ class UserCreateView(BasicView):
         return self.response({'user_id': user.id})
 ```
 #### csrf_exempt와 method_decorator
-
+- csrf_exempt 는 csrf token을 생성해주는 decorator 이다. 하지만 이번 프로젝트에서는 FBV가 아닌 CBV를 사용하기 때문에 view의 함수들이 클래스로 선언되어 있다. 클래스로 선언되어 있기 때문에 method_decorator 라는 것을 import해서 클래스 view의 dispatch 함수에 csrf_exempt를 적용시켜 주어야 한다.
+#### 클래스형 뷰의 동작방식
+- 클래스형 뷰는 클래스로 진입하기 위한 진입 메소드 as_view() 메소드를 제공한다. 
+- as_view() 메소드에서 클래스의 인스턴스를 생성한다.
+- 생성된 인스턴스의 dispatch() 메소드를 호출한다.
+- diapatch() 메소드는 요청을 검사해서 HTTP이 메소드(GET,POST)를 알아낸다.
+- 인스턴스 내에 해당 이름을 갖는 메소드로 요청을 중계한다.
+- 해당 메소드가 정의되어 있지 않으면, HTTPResponseNotAllowed 예외를 발생시킨다.
 
 ## Chapter3. Login & Logout API
 ## Chapter4. Register API
