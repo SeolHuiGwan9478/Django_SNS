@@ -182,5 +182,176 @@ class NoneUserTemplateView(TemplateView):
 - [request.user](https://docs.djangoproject.com/en/3.1/ref/request-response/#django.http.HttpRequest.user) 에 is_anonymous 함수를 이용하여 로그아웃 여부를 확인한 후, 로그아웃을 하지 않았다면 home으로 redirect하도록 해주었고, 로그아웃 하였다면 로그인 페이지로 이동하도록 코드를 작성하였다. 
 - 마지막에 현재 dispatch 함수를 재정의하고 있으므로 super 의 dispatch 또한 호출하도록 한다.
 ## Chapter4. Contents & Image
+#### content/models.py
+```python
+from django.db import models
+from django.contrib.auth.models import User
+import os, uuid
+# Create your models here.
+
+class BaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+    
+class Content(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='작성자')
+    text = models.TextField(verbose_name='글 내용',default='')
+
+    class Meta:
+        ordering = ['-created_at']
+
+def image_upload_to(instance, filename):
+    ext = filename.split('.')[-1] #확장자
+    return os.path.join(instance.UPLOAD_PATH, "%s.%s" % (uuid.uuid4(), ext))
+
+class Image(BaseModel):
+    UPLOAD_PATH = 'user-upload'
+    content = models.ForeignKey(Content, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to=image_upload_to)
+    order = models.SmallIntegerField()
+
+    class Meta:
+        unique_together = ['content', 'order']
+        ordering = ['order']
+
+class FollowRelation(BaseModel):
+    follower = models.OneToOneField(User, related_name='follower', on_delete=models.CASCADE)
+    followee = models.ManyToManyField(User, related_name='followee')
+```
+#### settings.py
+```python
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        #os.path.join(BASE_DIR, 'templates')
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+```
+- Static vs media 
+파일에는 static 정적 파일과 Dynamic 동적 이미지 파일이 존재한다. 정적인 파일에는 서버에 처음부터 등록해 놓은 일반적인 static image 파일이 존재하고, 클라이언트가 업로드 하는 media 파일이 존재한다. 그래서 settings.py에 media, static 파일들이 저장될 경로를 설정해주어야 한다.
+- Template
+template 에서 DIRS 가 template 파일들이 저장될 곳이고, APP_DIRS 는 True 이면 각 앱의 templates 폴더를 찾도록 허용하는 것이다.
+
+#### apis/views.py
+```python
+@method_decorator(login_required, name='dispatch')
+class ContentCreateView(BasicView):
+    def post(self, request):
+        text = request.POST.get('text','').strip()
+        content = Content.objects.create(user=request.user, text=text)
+        for idx, file in enumerate(request.FILES.values()):
+            Image.objects.create(content=content, image=file, order=idx)
+        
+        return self.response()
+```
 ## Chapter5. Following & Unfollowing
-## Chapter6. Search User function
+#### apis/views.py
+```python
+@method_decorator(login_required, name='dispatch')
+class RelationView(TemplateView):
+
+    template_name = 'relation.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(RelationView, self).get_context_data(**kwargs)
+
+        user = self.request.user
+
+        # 내가 팔로우하는 사람들
+        try:
+            followers = FollowRelation.objects.get(follower=user).followee.all()
+            context['followees'] = followers
+            context['followees_ids'] = list(followers.values_list('id', flat=True))
+            
+        except FollowRelation.DoesNotExist:
+            pass
+
+        try:
+            context['followers'] = FollowRelation.objects.filter(followee=user)
+        except FollowRelation.DoesNotExist:
+            pass
+
+        print(context)    
+        return context
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class RelationCreateView(BasicView):
+    def post(self, request):
+        try:
+            user_id = request.POST.get('id','')
+        except ValueError:
+            return self.response(message='잘못된 요청입니다.', status=400)
+    
+        try:
+            relation = FollowRelation.objects.get(follower=request.user)
+        except FollowRelation.DoesNotExist:
+            relation = FollowRelation.objects.create(follower=request.user)
+
+        try:
+            if user_id == request.user.id:
+                # 자기 자신은 팔로우 안됨.
+                raise IntegrityError
+            relation.followee.add(user_id)
+            relation.save()
+        except IntegrityError:
+            return self.response(message='잘못된 요청입니다.')
+
+        return self.response({})
+
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class RelationDeleteView(BasicView):
+    def post(self, request):
+        try:
+            user_id = request.POST.get('id','')
+        except ValueError:
+            return self.response(message="잘못된 요청입니다.", status=400)
+        
+        try:
+            relation = FollowRelation.objects.get(follower=request.user)
+        except FollowRelation.DoesNotExist:
+            return self.response(message='잘못된 요청입니다.', status=400)
+        
+        try:
+            if user_id == request.user.id:
+                raise IntegrityError
+            relation.followee.remove(user_id)
+            relation.save()
+        except IntegrityError:
+            return self.response(message="잘못된 요청입니다.", status=400)
+
+        return self.response({})
+
+class UserGetView(BasicView):
+
+    def get(self, request):
+        username = request.GET.get('username','').strip()
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            self.response(message='사용자를 찾을 수 없습니다.', status=404)
+        return self.response({'username': username, 'email': user.email, 'id':user.id})
+```
+- one-to-one, many-to-many field 알아보기
+
