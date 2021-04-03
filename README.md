@@ -1,4 +1,39 @@
 ## Social NetWork Service(SNS) Web
+![image](https://user-images.githubusercontent.com/67581495/113472710-01c07380-94a0-11eb-8f2e-19baa8877339.png)
+![image](https://user-images.githubusercontent.com/67581495/113472738-287eaa00-94a0-11eb-9dda-4a82659a1f86.png)
+![image](https://user-images.githubusercontent.com/67581495/113472782-4946ff80-94a0-11eb-8da9-608671cc6018.png)
+#### Homeview in contest/views.py 
+```python
+from django.shortcuts import render
+from django.views.generic.base import TemplateView
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.db.models import Prefetch
+from .models import Content, FollowRelation
+# Create your views here.
+
+@method_decorator(login_required, name='dispatch')
+class HomeView(TemplateView):
+    template_name = 'home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(HomeView, self).get_context_data(**kwargs)
+        user = self.request.user
+        followees = FollowRelation.objects.filter(follower=user).values_list('followee__id', flat=True)
+        lookup_user_ids = [user.id] + list(followees)
+        context['contents'] = Content.objects.select_related('user').prefetch_related('image_set').filter(
+            user__id__in = lookup_user_ids #이 변수는 아직 모르겠음.
+        )
+
+        return context 
+```
+- .get() 과 .filter()
+.get은 그에 해당되는 객체 하나만을 가져온다. 그리고 .filter는 그에 해당되는 여러 객체를 반환한다.
+- 쓸데없는 쿼리 요청을 줄이기 위한 select_related와 prefetch_related 공부하기
+- values vs values_list
+values: object의 원하는 컬럼만 가져오기 위해서는 values를 사용할 수 있다. values를 사용하면 해당 컬럼의 key, value의 쌍의 리스트를 얻을 수 있다. 
+values_list: values_list()를 사용하면 key, value의 형태가 아닌 tuples 형태의 리스트로 가져올 수 있다. 그리고 그 내부에 flat 속성을 설정하면 tuples 형태가 아닌 값의 리스트를 얻을 수 있다.
+
 ## Chapter1. Base API View
 #### apis/models.py
 - 대부분의 모델 클래스들이 공통적인 모델 요소들을 가질 때 매번 모델의 필드를 선언해주는 것 보다는 BaseModel을 만들어 다른 모델 클래스에서 상속받는 것이 더 좋은 방법이다.
