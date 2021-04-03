@@ -167,6 +167,20 @@ LOGIN_URL = '/login/'
 #### IntegrityError & ValidationError
 - [IntegrityError](https://code.djangoproject.com/wiki/IntegrityError) 는 무결성 오류를 의미한다. 예를 들어 외래키 검색 실패 또는 중복 키 등의 문제가 있을 때 발생하는 오류이다.
 - validate_email을 import 하여 입력한 email의 유효성을 검사한다. 만약 email 형식이 아니라면 validate_email() 함수는 ValidationError(유효성 에러)를 발생시킬 것이다. 이러한 에러를 처리하기 위해 ValidationError를 try-except 문과 함께 활용하였다.
+#### login_required
+- login_required decorator를 import 하여 로그인이 필요한 view에 적용시켜 주었다.
+- settings.py의 LOGIN_URL 는 login_required decorator을 사용했을 때 로그인이 되어있지 않을 시 이동해야 할 URL을 설정해준 것이다.
+#### NoneUserTemplateView
+```python
+class NoneUserTemplateView(TemplateView):
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_anonymous:
+            return redirect('content_home')
+        return super(NoneUserTemplateView, self).dispatch(request, *args, **kwargs)
+```
+- 제네릭 뷰 중 TeplateView를 상속받아 코드를 작성하였다. TemplateView는 teplate_name = '이름.html'을 해주면 그 html을 보여준다.
+- [request.user](https://docs.djangoproject.com/en/3.1/ref/request-response/#django.http.HttpRequest.user) 에 is_anonymous 함수를 이용하여 로그아웃 여부를 확인한 후, 로그아웃을 하지 않았다면 home으로 redirect하도록 해주었고, 로그아웃 하였다면 로그인 페이지로 이동하도록 코드를 작성하였다. 
+- 마지막에 현재 dispatch 함수를 재정의하고 있으므로 super 의 dispatch 또한 호출하도록 한다.
 ## Chapter4. Contents & Image
 ## Chapter5. Following & Unfollowing
 ## Chapter6. Search User function
