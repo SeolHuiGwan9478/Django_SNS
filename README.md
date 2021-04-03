@@ -61,7 +61,7 @@ HttpRequest.POST # POST 파라미터를 담고 있는 딕셔너리 같은 객체
 * 조건문을 이용한 HTTP 메소드 처리
 * 확장과 재사용에 어려움
 
-## Chapter2. User API
+## Chapter2. UserRegister API
 #### apis/views.py
 ```python
 class UserCreateView(BasicView):
@@ -103,9 +103,70 @@ class UserCreateView(BasicView):
 - diapatch() 메소드는 요청을 검사해서 HTTP이 메소드(GET,POST)를 알아낸다.
 - 인스턴스 내에 해당 이름을 갖는 메소드로 요청을 중계한다.
 - 해당 메소드가 정의되어 있지 않으면, HTTPResponseNotAllowed 예외를 발생시킨다.
+---
+#### User model
+장고의 auth 기능은 [User](https://docs.djangoproject.com/en/3.1/topics/auth/default/) 객체를 제공한다. 우리는 따로 models.py 에 데이터 필드를 구현하지 않고도 User 객체로 여러 인증을 구현할 수 있다. User model은 기본적으로 있는 여러 필드들이 존재한다.
+- username: 필수사항. 150자 이하, 영숫자를 포함하도록 기본적인 validate가 있다.
+- first_name: 선택사항. 30자 이하
+- last_name: 선택사항. 150자 이하
+- email: 선택사항
+- password: 필수사항. 설정한 암호의 해시값과 메타데이터 값이다. 장고는 원래 암호를 그대로 저장하지 않고 특정 알고리즘으로 암호화 후 저장
+- groups: 그룹에 대한 필드
+- user_permission: 유저의 권한을 설정하는 필드
+- is_staff: 참이면 admin 사이트에 접속할 수 있다.
+- is_active: 이 계정을 활성화할 것인지 결정
+- is_superuser: 모든 권한을 갖게 한다.
+- last_login: 마지막으로 로그인한 시간을 기록
+- date_joined: 계정이 생성된 날짜를 기록
+---
 
 ## Chapter3. Login & Logout API
-## Chapter4. Register API
-## Chapter5. Contents & Image
-## Chapter6. Following & Unfollowing
-## Chapter7. Search User function
+#### apis/views.py Login View
+```python
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
+class UserLoginView(BasicView):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(UserLoginView,self).dispatch(request, *args, **kwargs)
+
+    def post(self, request):
+        username = request.POST.get('username', '')
+        if not username:
+            return self.response(message='아이디를 입력해주세요.', status=400)
+        password = request.POST.get('password', '')
+        if not password:
+            return self.response(message='비밀번호를 입력해주세요.', status=400)
+        user = authenticate(request, username=username, password=password)
+
+        if user is None:
+            return self.response(message='입력 정보를 확인해주세요', status=400)
+        login(request, user)
+
+        return self.response()
+```
+#### apis/views.py Logout View
+```python
+class UserLogoutView(BasicView):
+    def get(self, request):
+        logout(request)
+        return self.response()
+```
+#### settings.py
+```python
+LOGIN_URL = '/login/'
+```
+#### Login, Logout and Authenticate
+[Document](https://docs.djangoproject.com/en/3.1/topics/auth/default/)
+- django.contrib.auth 에서 login, logout, authenticate를 import 한다.
+- 함수 login과 logout은 매개변수로 request 를 기본적으로 받는다. 
+- authenticate 함수는 user의 유효성을 확인하는데 사용되는 함수이다. 만약 user가 DB에 존재한다면 그 user 객체를 반환하고, 존재하지 않는다면 None 을 반환한다.
+#### IntegrityError & ValidationError
+- [IntegrityError](https://code.djangoproject.com/wiki/IntegrityError) 는 무결성 오류를 의미한다. 예를 들어 외래키 검색 실패 또는 중복 키 등의 문제가 있을 때 발생하는 오류이다.
+- validate_email을 import 하여 입력한 email의 유효성을 검사한다. 만약 email 형식이 아니라면 validate_email() 함수는 ValidationError(유효성 에러)를 발생시킬 것이다. 이러한 에러를 처리하기 위해 ValidationError를 try-except 문과 함께 활용하였다.
+## Chapter4. Contents & Image
+## Chapter5. Following & Unfollowing
+## Chapter6. Search User function
